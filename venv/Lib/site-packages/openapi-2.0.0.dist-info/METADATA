@@ -1,0 +1,32 @@
+Metadata-Version: 2.1
+Name: openapi
+Version: 2.0.0
+Summary: Python OpenAPI 2.0 (Swagger) object model
+Home-page: https://github.com/globality-corp/openapi
+Author: Globality Engineering
+Author-email: engineering@globality.com
+Keywords: openapi swagger
+Classifier: Programming Language :: Python :: 3
+License-File: LICENSE
+Requires-Dist: inflection >=0.5.1
+Requires-Dist: jsonschema >=3.2.0
+Provides-Extra: lint
+Requires-Dist: flake8 ; extra == 'lint'
+Requires-Dist: flake8-print ; extra == 'lint'
+Requires-Dist: flake8-isort ; extra == 'lint'
+Provides-Extra: test
+Requires-Dist: coverage >=7.5.3 ; extra == 'test'
+Requires-Dist: PyHamcrest >=2.1.0 ; extra == 'test'
+Requires-Dist: pytest-cov >=5.0.0 ; extra == 'test'
+Requires-Dist: pytest >=8.2.0 ; extra == 'test'
+Requires-Dist: PyYAML >=6.0.1 ; extra == 'test'
+Provides-Extra: typehinting
+Requires-Dist: mypy ; extra == 'typehinting'
+Requires-Dist: types-psycopg2 ; extra == 'typehinting'
+Requires-Dist: types-python-dateutil ; extra == 'typehinting'
+Requires-Dist: types-pytz ; extra == 'typehinting'
+Requires-Dist: types-setuptools ; extra == 'typehinting'
+Requires-Dist: types-PyYAML ; extra == 'typehinting'
+Provides-Extra: yaml
+Requires-Dist: PyYAML >=3.12 ; extra == 'yaml'
+
