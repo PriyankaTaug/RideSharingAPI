@@ -17,3 +17,14 @@ class UserTbl(models.Model):
     username = models.CharField(max_length=255,unique=True)
     password = models.CharField(max_length=255)
     empid = models.ForeignKey(UserRegisteration,on_delete=models.CASCADE)
+
+
+class RideTbl(models.Model):
+    rider = models.ForeignKey(UserTbl,on_delete=models.CASCADE,related_name="rider_data")
+    driver = models.ForeignKey(UserTbl,on_delete=models.CASCADE,related_name="driver_data")
+    pickup_location = models.CharField(max_length=255)
+    drop_location = models.CharField(max_length=255)
+    status = models.IntegerField()
+    created_at = models.DateField()
+    updated_at = models.DateField()
+    
