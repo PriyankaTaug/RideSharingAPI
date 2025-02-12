@@ -139,6 +139,57 @@ class RiderLogin(viewsets.ViewSet):
             return JsonResponse({'message': 'Internal server error'}, status=500)
 
 
+''' Login for driver '''
+class DiverLogin(viewsets.ViewSet):
+    @swagger_auto_schema(
+        operation_id='User Login',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING),
+                'password': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={
+            status.HTTP_200_OK: openapi.Response(description="Success"),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(description="Bad Request"),
+        },
+    )
+    def create(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        try:
+            user_data = DriverUserTbl.objects.get(username=username, password=password)
+            user_login_data = {
+                'exp': int((dt.now() + timedelta(days=7)).timestamp()),  # Token expiration
+                'Name': str(user_data.driverid.firstname),
+                'id': str(user_data.driverid.id)
+            }
+
+            # Encode access token
+            access_token = jwt.encode(user_login_data, 'secret', algorithm='HS256')
+
+            # Encode refresh token
+            refresh_token_payload = {
+                **user_login_data,
+                'refresh_exp': int((dt.now() + timedelta(hours=12)).timestamp()),
+            }
+            refresh_token = jwt.encode(refresh_token_payload, 'secret', algorithm='HS256')
+
+            response_data = {
+                'message': 'Login successful',
+                'access': access_token,
+                'refresh': refresh_token,
+                'id': str(user_data.driverid.id)
+            }
+
+            return JsonResponse(response_data, status=200)
+        except RiderUserTbl.DoesNotExist:
+            return JsonResponse({"message": "Invalid credentials"}, status=400)
+        except Exception as e:
+            print("Error:", e)
+            return JsonResponse({'message': 'Internal server error'}, status=500)
 
 class PaginateRide(PageNumberPagination):
     page_size = 10
