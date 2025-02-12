@@ -52,6 +52,6 @@ class RideTbl(models.Model):
     pickup_location = models.CharField(max_length=255)
     drop_location = models.CharField(max_length=255)
     status = models.IntegerField(choices=STATUS_CHOICE,default=0)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
     
