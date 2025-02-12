@@ -3,7 +3,16 @@
 ## 🚗 Overview
 This project is a **Ride Sharing API** built with **Django Rest Framework (DRF)**, utilizing class-based viewsets to manage users, rides, and ride status updates.
 
+## HTML page for rider
+
+Login for Riders to add request
+
 <img src="media/profile/image.png" alt="Ride Sharing Image" width="300">
+
+After successfull login it will navugate to request form
+
+<img src="media/profile/image1.png" alt="Ride Sharing Image" width="300">
+
 ## 📌 Features
 
 ### 🏷 User API
@@ -39,12 +48,7 @@ API endpoints to update ride status when:
 ### ✅ Basic Testing (Bonus for Juniors)
 - Basic Django tests for models and API endpoints.
 
-### 🛠 Advanced Testing (Bonus for Seniors)
-- Tests for:
-  - Ride Matching Algorithm
-  - Ride Status Updates
-  - Driver API Endpoints
-- Ride Tracking Simulation
+
 
 ## 🚀 Getting Started
 
@@ -67,13 +71,3 @@ API endpoints to update ride status when:
    ```bash
    python manage.py runserver
    ```
-
-## 📜 License
-This project is licensed under the MIT License.
-
-## 🤝 Contributing
-Contributions are welcome! Feel free to submit issues and pull requests.
-
-## 📞 Contact
-For any inquiries, reach out to **Priyanka T.** via [GitHub](https://github.com/PriyankaTaug).
-
