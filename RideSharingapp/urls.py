@@ -18,4 +18,5 @@ urlpatterns = [
   path('RideStatusUpdate/<int:id>/',RideStatusUpdate.as_view({'patch':'update'}),name='RideStatusUpdate'),
   path('RideRequestAccept/',RideRequestAccept.as_view({'patch':'update'}),name='RideRequestAccept'),
   path('RegisterRider/',RegisterRider.as_view({'post':'create'}),name='RegisterRider'),
+  path('DiverLogin/',DiverLogin.as_view({'post':'create'}),name='DiverLogin'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "corsheaders",
     'drf_yasg',
+    'pytest_django',   # If using pytest-django
 ]
 
 MIDDLEWARE = [
