@@ -17,16 +17,11 @@ from django.views.generic import TemplateView
 logger = logging.getLogger(__name__)
 
 
-
-
-
-class LoginPageView(TemplateView):
-    template_name = "login.html"
-
+''' Added a login page for Rider '''
 class RiderPageView(TemplateView):
     template_name = "login1.html"
 
-
+'''Login for driver '''
 class RiderDashboardView(TemplateView):
     template_name = "dashboard.html"
 
@@ -35,8 +30,8 @@ class RiderDashboardView(TemplateView):
         context['driver_data'] = DriverRegisteration.objects.all()  # Pass driver data to the template
         return context
 
-'''' User creation both for driver and rider,the user is diffferentiating by usertype'''
 
+''' Driver Created successfully '''
 class RegisterUser(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_id='create_user',
@@ -47,10 +42,7 @@ class RegisterUser(viewsets.ModelViewSet):
                 'username': openapi.Schema(type=openapi.TYPE_STRING),
                 'password': openapi.Schema(type=openapi.TYPE_STRING, format='password'),
                 'lastname': openapi.Schema(type=openapi.TYPE_STRING),
-                'usertype': openapi.Schema(
-                    type=openapi.TYPE_STRING, 
             
-                ),
                 'phonenumber': openapi.Schema(
                     type=openapi.TYPE_STRING, 
             
@@ -94,7 +86,7 @@ class RegisterUser(viewsets.ModelViewSet):
         
 
 
-
+''' After successfull login of rider it will navigate to a dashboard where he/she can see the ride request form '''
 class RiderLogin(viewsets.ViewSet):
     @swagger_auto_schema(
         operation_id='User Login',
@@ -136,6 +128,7 @@ class RiderLogin(viewsets.ViewSet):
                 'message': 'Login successful',
                 'access': access_token,
                 'refresh': refresh_token,
+                'id': str(user_data.riderid.id)
             }
 
             return JsonResponse(response_data, status=200)
@@ -152,9 +145,9 @@ class PaginateRide(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
     
+
+''' Ride request add,list '''
 class RideRequest(viewsets.ViewSet):
-    
-    
     def list(self,request):
         queryset = RideTbl.objects.all()
         paginator = PaginateRide()
@@ -171,8 +164,10 @@ class RideRequest(viewsets.ViewSet):
                 serializer.save()
                 return Response({'status':"Success",'message':'User created successfully'},status=status.HTTP_201_CREATED)
             else:
+                print(serializer.errors)
                 return Response({'status':"Error","message":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            print("error",e)
             logger.error(f"Error creating navbar header: {str(e)}")  # Log the error
             return Response({
                 "status": "Error",
@@ -180,7 +175,7 @@ class RideRequest(viewsets.ViewSet):
                 "details": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-    
+''' To  retrieve a particular ride detail''' 
 class UserRideDetail(viewsets.ViewSet):
     def retrive(self,request,id=None):
         try:
@@ -190,7 +185,7 @@ class UserRideDetail(viewsets.ViewSet):
         except Exception as e:
             return Response({"error":"Ride not found"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        
+''' Ride status update'''      
 class RideStatusUpdate(viewsets.ViewSet):
     def update(self,request,id=None):
         try:
@@ -203,7 +198,7 @@ class RideStatusUpdate(viewsets.ViewSet):
             return Response({"error":"Ride not found"},status=status.HTTP_404_NOT_FOUND)
         
         
-
+''' Ride request accet by driver'''
 class RideRequestAccept(viewsets.ViewSet):
     def update(self, request):
         try:
@@ -272,6 +267,47 @@ class RegisterRider(viewsets.ModelViewSet):
                 return Response({'status':"Error","message":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.error(f"Error creating navbar header: {str(e)}")  # Log the error
+            return Response({
+                "status": "Error",
+                "message": "Unexpected error occurred",
+                "details": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+    
+
+
+
+class MatchingAlgorithm(viewsets.ViewSet):
+    def list(self, request):
+        try:
+            ride_list = RideTbl.objects.all()
+            driver_list = DriverRegisteration.objects.filter(is_available=True)
+            matches = {}
+            assigned_drivers = set()
+            for ride in ride_list:
+                closest_driver = None
+                min_distance = float('inf')
+                for driver in driver_list:
+                    distance_calc = abs(ride.latitude-driver.latitude) +  abs(ride.longitude-driver.longitude)
+                    if distance_calc < min_distance:
+                        min_distance = distance_calc
+                        closest_driver = driver
+                if closest_driver:
+                    matches[ride.id] = closest_driver.id
+                    assigned_drivers.add(closest_driver.id)
+  
+            logger.info("Ride status updated successfully")  
+            return Response({'status': "Success", 'matches': matches}, status=status.HTTP_200_OK)
+
+        except RideTbl.DoesNotExist:  # ✅ Handle invalid ID
+            return Response({
+                "status": "Error",
+                "message": "Ride not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            logger.error(f"Error updating ride status: {str(e)}")  
             return Response({
                 "status": "Error",
                 "message": "Unexpected error occurred",

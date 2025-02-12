@@ -30,48 +30,107 @@
     <!-- Hero Section -->
     <div class="hero-section">
         <h1>Ride Request</h1>
-        <form class="row g-3">
-        
-        
+        <form class="row g-3" id="rideRequestForm">
             <div class="col-md-6">
                 <label for="inputCity" class="form-label">Pickup Location</label>
-                <input type="text" class="form-control" id="inputCity">
+                <input type="text" class="form-control" id="inputCity" name="pickup_location">
             </div>
-           
+        
             <div class="col-md-6">
                 <label for="inputZip" class="form-label">Drop Location</label>
-                <input type="text" class="form-control" id="inputZip">
+                <input type="text" class="form-control" id="inputZip" name="drop_location">
             </div>
-           
+        
+            <p>Your Rider ID: <span id="riderId" name="rider"></span></p>
+        
+            <!-- Hidden input to store selected Driver ID -->
+            <input type="hidden" id="selectedDriverId" name="driver">
+          
+          
+        
+            <div class="row mt-5">
+                {% for driver in driver_data %}
+                <div class="col-md-4">
+                    <div class="card driver-card" data-driver-id="{{ driver.id }}">
+                        {% if driver.image %}
+                        <img src="{{ driver.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Driver Image">
+                        {% else %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center" 
+                             style="height: 200px; background-color: #6c757d; color: white;">
+                            No Image Available
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ driver.firstname }}</h5>
+                            <p class="card-text">Vehicle Type: {{ driver.vehicle_type }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
             <div class="col-12 mt-5">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>
-    </div>
-
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const driverCards = document.querySelectorAll(".driver-card");
+                const selectedDriverInput = document.getElementById("selectedDriverId");
+        
+                driverCards.forEach(card => {
+                    card.addEventListener("click", function () {
+                        // Remove selection from other cards
+                        driverCards.forEach(c => c.classList.remove("border", "border-primary"));
+        
+                        // Add border to selected card
+                        this.classList.add("border", "border-primary");
+        
+                        // Store selected driver ID
+                        selectedDriverInput.value = this.dataset.driverId;
+                    });
+                });
+        
+                document.getElementById("rideRequestForm").addEventListener("submit", function (event) {
+                    event.preventDefault(); // Prevent default form submission
+        
+                    const formData = new FormData(this);
+        
+                    if (!selectedDriverInput.value) {
+                        alert("Please select a driver before submitting.");
+                        return;
+                    }
+        
+                    fetch("/RideRequest/", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert("Ride request submitted successfully!");
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Failed to submit ride request.");
+                    });
+                });
+            });
+        </script>
+        
     <!-- Cards Section -->
-    <div class="row">
-        {% for driver in driver_data %}
-        <div class="col-md-4">
-            <div class="card">
-                {% if driver.image %}
-                <img src="{{ driver.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Driver Image">
-                {% else %}
-                <div class="card-img-top d-flex align-items-center justify-content-center" 
-                     style="height: 200px; background-color: #6c757d; color: white;">
-                    No Image Available
-                </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ driver.firstname }}</h5> <!-- Display driver's name -->
-                    <p class="card-text">Vehicle Type: {{ driver.vehicle_type }}</p> <!-- Display vehicle type -->
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
     
-
+    <script>
+        // Retrieve the Rider ID from localStorage
+        document.addEventListener("DOMContentLoaded", function () {
+            const riderId = localStorage.getItem("rider_id");
+            if (riderId) {
+                document.getElementById("riderId").innerText = riderId;
+            } else {
+                document.getElementById("riderId").innerText = "Not available";
+            }
+        });
+    </script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
