@@ -65,6 +65,7 @@ API endpoints to update ride status when:
    ```
 3. Run migrations:
    ```bash
+   python manage.py migration
    python manage.py migrate
    ```
 4. Run the development server:
